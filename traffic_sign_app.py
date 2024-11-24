@@ -13,17 +13,11 @@ transform = transforms.Compose([
 st.title("Traffic Sign Detection")
 st.write("Upload an image to classify the traffic sign!")
 
-# File uploader
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
-
 # Load the entire model (architecture + weights)
-try:
-    model = torch.load("traffic_sign_model.pth", map_location=torch.device("cpu"))
-    model.eval()  # Set the model to evaluation mode
-    st.write("Model successfully loaded!")
-except Exception as e:
-    st.error(f"Error loading model: {e}")
-    st.stop()
+model = torch.load("traffic_sign_model.pth", map_location=torch.device("cpu"))
+model.eval()  # Set the model to evaluation mode
+st.write("Model successfully loaded!")
+
 
 # Define class labels
 class_labels = {
@@ -40,6 +34,9 @@ class_labels = {
     38: "Keep Right", 39: "Keep Left", 40: "Roundabout Mandatory", 41: "End of No Passing",
     42: "End of No Passing for Vehicles > 3.5T"
 }
+
+# File uploader
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
     # Open and display the uploaded image
