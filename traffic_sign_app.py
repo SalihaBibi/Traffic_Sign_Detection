@@ -5,7 +5,7 @@ from PIL import Image
 import tensorflow as tf
 
 # Load the pre-trained model
-model = load_model('resnet18_gtsrb.h5')
+model = load_model('/content/traffic_sign_model.h5')  # Update the path to where the model is saved
 
 # Define a function to preprocess the image
 def preprocess_image(image):
