@@ -1,57 +1,80 @@
 import streamlit as st
 from tensorflow.keras.models import load_model
-import numpy as np
 from PIL import Image
-import tensorflow as tf
+import numpy as np
 
-# Load the pre-trained model
-model = load_model('/content/traffic_sign_model.h5')  # Update the path to where the model is saved
+# Load the trained model
+model = load_model('traffic_sign_model.h5')
 
-# Define a function to preprocess the image
-def preprocess_image(image):
-    image = image.resize((64, 64))  # Resize to the input size of the model
-    image = np.array(image) / 255.0  # Normalize the image (scaling to [0, 1])
-    
-    if len(image.shape) == 2:  # If image is grayscale, convert to RGB
-        image = np.stack([image] * 3, axis=-1)  # Convert single channel to 3 channels
-    
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
-    return image
-
-# Define class labels
+# Class labels for the traffic sign dataset
 class_labels = {
-    0: "Speed Limit 20", 1: "Speed Limit 30", 2: "Speed Limit 50", 3: "Speed Limit 60",
-    4: "Speed Limit 70", 5: "Speed Limit 80", 6: "End of Speed Limit 80", 7: "Speed Limit 100",
-    8: "Speed Limit 120", 9: "No Passing", 10: "No Passing for Vehicles > 3.5T", 11: "Right of Way",
-    12: "Priority Road", 13: "Yield", 14: "Stop", 15: "No Vehicles", 16: "Vehicles > 3.5T Prohibited",
-    17: "No Entry", 18: "General Caution", 19: "Dangerous Curve Left", 20: "Dangerous Curve Right",
-    21: "Double Curve", 22: "Bumpy Road", 23: "Slippery Road", 24: "Road Narrows on Right",
-    25: "Road Work", 26: "Traffic Signals", 27: "Pedestrians", 28: "Children Crossing",
-    29: "Bicycles Crossing", 30: "Beware of Ice/Snow", 31: "Wild Animals Crossing",
-    32: "End of All Restrictions", 33: "Turn Right Ahead", 34: "Turn Left Ahead",
-    35: "Ahead Only", 36: "Go Straight or Right", 37: "Go Straight or Left",
-    38: "Keep Right", 39: "Keep Left", 40: "Roundabout Mandatory", 41: "End of No Passing",
-    42: "End of No Passing for Vehicles > 3.5T"
+    0: "Speed limit (20km/h)",
+    1: "Speed limit (30km/h)",
+    2: "Speed limit (50km/h)",
+    3: "Speed limit (60km/h)",
+    4: "Speed limit (70km/h)",
+    5: "Speed limit (80km/h)",
+    6: "End of speed limit (80km/h)",
+    7: "Speed limit (100km/h)",
+    8: "Speed limit (120km/h)",
+    9: "No passing",
+    10: "No passing for vehicles over 3.5 metric tons",
+    11: "Right-of-way at the next intersection",
+    12: "Priority road",
+    13: "Yield",
+    14: "Stop",
+    15: "No vehicles",
+    16: "Vehicles over 3.5 metric tons prohibited",
+    17: "No entry",
+    18: "General caution",
+    19: "Dangerous curve to the left",
+    20: "Dangerous curve to the right",
+    21: "Double curve",
+    22: "Bumpy road",
+    23: "Slippery road",
+    24: "Road narrows on the right",
+    25: "Road work",
+    26: "Traffic signals",
+    27: "Pedestrians",
+    28: "Children crossing",
+    29: "Bicycles crossing",
+    30: "Beware of ice/snow",
+    31: "Wild animals crossing",
+    32: "End of all speed and passing limits",
+    33: "Turn right ahead",
+    34: "Turn left ahead",
+    35: "Ahead only",
+    36: "Go straight or right",
+    37: "Go straight or left",
+    38: "Keep right",
+    39: "Keep left",
+    40: "Roundabout mandatory",
+    41: "End of no passing",
+    42: "End of no passing by vehicles over 3.5 metric tons"
 }
 
-# Streamlit interface
-st.title("Traffic Sign Detection")
-st.write("Upload an image of a traffic sign to detect it.")
+# Streamlit app UI
+st.title("Traffic Sign Classification")
+st.write("Upload a traffic sign image to predict its class.")
 
-# Upload image
-uploaded_image = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
+# File uploader
+uploaded_file = st.file_uploader("Choose a traffic sign image...", type=["jpg", "jpeg", "png"])
 
-if uploaded_image is not None:
-    image = Image.open(uploaded_image)
-    st.image(image, caption='Uploaded Image.', use_column_width=True)
-    st.write("")
-
+if uploaded_file is not None:
+    # Load and preprocess the image
+    image = Image.open(uploaded_file).convert('RGB')
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+    
     # Preprocess the image
-    processed_image = preprocess_image(image)
+    image = image.resize((64, 64))  # Resize to model input size
+    image_array = np.array(image) / 255.0  # Normalize pixel values
+    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
 
-    # Make predictions
-    predictions = model.predict(processed_image)
-    class_idx = np.argmax(predictions, axis=1)
+    # Predict
+    prediction = model.predict(image_array)
+    predicted_class = np.argmax(prediction, axis=1)[0]
+    confidence = np.max(prediction)
 
-    # Display the prediction
-    st.write(f"Predicted class: {class_labels[class_idx[0]]}")
+    # Display the result
+    st.write(f"**Predicted Class:** {class_labels[predicted_class]}")
+    st.write(f"**Confidence:** {confidence:.2f}")
