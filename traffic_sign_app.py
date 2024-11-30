@@ -1,8 +1,14 @@
+import os 
+from os import symlink
 import streamlit as st
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from PIL import Image
 import numpy as np
+
+# Streamlit app UI
+st.title("Traffic Sign Classification")
+st.write("Upload a traffic sign image to predict its class.")
 
 # Load the trained model
 try:
@@ -58,10 +64,6 @@ class_labels = {
     41: "End of no passing",
     42: "End of no passing by vehicles over 3.5 metric tons"
 }
-
-# Streamlit app UI
-st.title("Traffic Sign Classification")
-st.write("Upload a traffic sign image to predict its class.")
 
 # File uploader
 uploaded_file = st.file_uploader("Choose a traffic sign image...", type=["jpg", "jpeg", "png"])
