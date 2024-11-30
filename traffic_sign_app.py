@@ -1,11 +1,16 @@
 import streamlit as st
-import tensorflow as ts
-from keras.models import load_model
+import tensorflow as tf
+from tensorflow.keras.models import load_model
 from PIL import Image
 import numpy as np
 
 # Load the trained model
-model = load_model('traffic_sign_model.h5')
+try:
+    model = load_model('traffic_sign_model.h5')
+    st.success("Model loaded successfully!")
+except Exception as e:
+    st.error(f"Failed to load the model: {e}")
+
 
 # Class labels for the traffic sign dataset
 class_labels = {
@@ -64,7 +69,8 @@ uploaded_file = st.file_uploader("Choose a traffic sign image...", type=["jpg", 
 if uploaded_file is not None:
     # Load and preprocess the image
     image = Image.open(uploaded_file).convert('RGB')
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    st.image(image, caption="Uploaded Image", use_container_width=True)
+
     
     # Preprocess the image
     image = image.resize((64, 64))  # Resize to model input size
